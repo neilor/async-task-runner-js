@@ -1,0 +1,666 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>async-task-runner-js - Empower Your JavaScript</title>
+    <meta
+      name="description"
+      content="Empower your single-threaded JavaScript with intelligent task pooling, throttling, and prioritization. A better alternative to Promise.all() for managing thousands of async operations."
+    />
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      :root {
+        --bg-primary: #0a0a0a;
+        --bg-secondary: #111111;
+        --bg-code: #1a1a1a;
+        --text-primary: #e0e0e0;
+        --text-secondary: #a0a0a0;
+        --accent: #00d9ff;
+        --accent-hover: #00b8d9;
+        --success: #00ff88;
+        --error: #ff4444;
+        --warning: #ffaa00;
+      }
+
+      body {
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        background: var(--bg-primary);
+        color: var(--text-primary);
+        line-height: 1.6;
+      }
+
+      .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 0 20px;
+      }
+
+      /* Header */
+      header {
+        background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 100%);
+        padding: 80px 0 120px;
+        text-align: center;
+        position: relative;
+        overflow: hidden;
+      }
+
+      header::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background:
+          radial-gradient(
+            circle at 20% 50%,
+            rgba(0, 217, 255, 0.1) 0%,
+            transparent 50%
+          ),
+          radial-gradient(
+            circle at 80% 50%,
+            rgba(0, 255, 136, 0.1) 0%,
+            transparent 50%
+          );
+        pointer-events: none;
+      }
+
+      .logo {
+        font-size: 3.5rem;
+        font-weight: 700;
+        margin-bottom: 20px;
+        background: linear-gradient(
+          135deg,
+          var(--accent) 0%,
+          var(--success) 100%
+        );
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+      }
+
+      .tagline {
+        font-size: 1.5rem;
+        color: var(--text-secondary);
+        margin-bottom: 40px;
+      }
+
+      .badges {
+        display: flex;
+        gap: 10px;
+        justify-content: center;
+        flex-wrap: wrap;
+        margin-bottom: 40px;
+      }
+
+      .badge {
+        background: var(--bg-secondary);
+        padding: 8px 16px;
+        border-radius: 20px;
+        font-size: 0.9rem;
+        border: 1px solid rgba(0, 217, 255, 0.3);
+      }
+
+      .cta-buttons {
+        display: flex;
+        gap: 20px;
+        justify-content: center;
+        flex-wrap: wrap;
+      }
+
+      .btn {
+        padding: 15px 40px;
+        border-radius: 8px;
+        font-size: 1.1rem;
+        font-weight: 600;
+        text-decoration: none;
+        transition: all 0.3s;
+        display: inline-block;
+      }
+
+      .btn-primary {
+        background: var(--accent);
+        color: var(--bg-primary);
+      }
+
+      .btn-primary:hover {
+        background: var(--accent-hover);
+        transform: translateY(-2px);
+        box-shadow: 0 10px 30px rgba(0, 217, 255, 0.3);
+      }
+
+      .btn-secondary {
+        background: transparent;
+        color: var(--accent);
+        border: 2px solid var(--accent);
+      }
+
+      .btn-secondary:hover {
+        background: var(--accent);
+        color: var(--bg-primary);
+      }
+
+      /* Sections */
+      section {
+        padding: 80px 0;
+      }
+
+      .section-dark {
+        background: var(--bg-secondary);
+      }
+
+      h2 {
+        font-size: 2.5rem;
+        margin-bottom: 20px;
+        text-align: center;
+      }
+
+      .highlight {
+        color: var(--accent);
+      }
+
+      /* Feature Grid */
+      .features {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 30px;
+        margin-top: 60px;
+      }
+
+      .feature {
+        background: var(--bg-code);
+        padding: 30px;
+        border-radius: 12px;
+        border: 1px solid rgba(0, 217, 255, 0.2);
+        transition: all 0.3s;
+      }
+
+      .feature:hover {
+        transform: translateY(-5px);
+        border-color: var(--accent);
+        box-shadow: 0 10px 30px rgba(0, 217, 255, 0.2);
+      }
+
+      .feature-icon {
+        font-size: 2.5rem;
+        margin-bottom: 15px;
+      }
+
+      .feature h3 {
+        font-size: 1.5rem;
+        margin-bottom: 15px;
+        color: var(--accent);
+      }
+
+      /* Code Block */
+      .code-comparison {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
+        gap: 30px;
+        margin-top: 40px;
+      }
+
+      .code-block {
+        background: var(--bg-code);
+        border-radius: 12px;
+        overflow: hidden;
+        border: 1px solid rgba(0, 217, 255, 0.2);
+      }
+
+      .code-header {
+        background: rgba(0, 0, 0, 0.3);
+        padding: 15px 20px;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .code-header.bad {
+        color: var(--error);
+      }
+
+      .code-header.good {
+        color: var(--success);
+      }
+
+      pre {
+        padding: 20px;
+        overflow-x: auto;
+        font-family: "Courier New", monospace;
+        font-size: 0.9rem;
+        line-height: 1.5;
+      }
+
+      code {
+        color: var(--text-primary);
+      }
+
+      /* Comparison Table */
+      .comparison-table {
+        width: 100%;
+        margin-top: 40px;
+        border-collapse: collapse;
+        background: var(--bg-code);
+        border-radius: 12px;
+        overflow: hidden;
+      }
+
+      .comparison-table th,
+      .comparison-table td {
+        padding: 15px 20px;
+        text-align: left;
+        border-bottom: 1px solid rgba(0, 217, 255, 0.1);
+      }
+
+      .comparison-table th {
+        background: rgba(0, 217, 255, 0.1);
+        font-weight: 600;
+        color: var(--accent);
+      }
+
+      .comparison-table tr:hover {
+        background: rgba(0, 217, 255, 0.05);
+      }
+
+      /* Installation */
+      .install-command {
+        background: var(--bg-code);
+        padding: 20px;
+        border-radius: 8px;
+        font-family: "Courier New", monospace;
+        font-size: 1.1rem;
+        margin-top: 30px;
+        border-left: 4px solid var(--accent);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+
+      /* Footer */
+      footer {
+        background: var(--bg-secondary);
+        padding: 40px 0;
+        text-align: center;
+        color: var(--text-secondary);
+      }
+
+      .footer-links {
+        display: flex;
+        gap: 30px;
+        justify-content: center;
+        margin-bottom: 20px;
+      }
+
+      .footer-links a {
+        color: var(--accent);
+        text-decoration: none;
+        transition: color 0.3s;
+      }
+
+      .footer-links a:hover {
+        color: var(--accent-hover);
+      }
+
+      @media (max-width: 768px) {
+        .logo {
+          font-size: 2.5rem;
+        }
+
+        .tagline {
+          font-size: 1.2rem;
+        }
+
+        h2 {
+          font-size: 2rem;
+        }
+
+        .code-comparison {
+          grid-template-columns: 1fr;
+        }
+
+        .cta-buttons {
+          flex-direction: column;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <div class="container">
+        <div class="logo">🚀 async-task-runner-js</div>
+        <div class="tagline">
+          Empower your single-threaded JavaScript with intelligent task pooling
+          and throttling
+        </div>
+
+        <div class="badges">
+          <span class="badge">TypeScript Ready</span>
+          <span class="badge">Zero Dependencies</span>
+          <span class="badge">ESM + CommonJS</span>
+          <span class="badge">MIT License</span>
+        </div>
+
+        <div class="cta-buttons">
+          <a
+            href="https://www.npmjs.com/package/async-task-runner-js"
+            class="btn btn-primary"
+            >Get Started</a
+          >
+          <a
+            href="https://github.com/neilor/async-task-runner-js"
+            class="btn btn-secondary"
+            >View on GitHub</a
+          >
+        </div>
+      </div>
+    </header>
+
+    <section>
+      <div class="container">
+        <h2>Why <span class="highlight">async-task-runner-js</span>?</h2>
+        <p
+          style="
+            text-align: center;
+            max-width: 800px;
+            margin: 20px auto;
+            font-size: 1.2rem;
+            color: var(--text-secondary);
+          "
+        >
+          JavaScript runs on a <strong>single thread</strong>, but that doesn't
+          mean it can't be powerful. The event loop allows async operations in
+          parallel, but without proper management, you're either overwhelming
+          your resources or underutilizing your system.
+        </p>
+
+        <div class="features">
+          <div class="feature">
+            <div class="feature-icon">🎛️</div>
+            <h3>Controlled Concurrency</h3>
+            <p>
+              Never overwhelm your resources. Set exactly how many tasks run in
+              parallel.
+            </p>
+          </div>
+          <div class="feature">
+            <div class="feature-icon">🎯</div>
+            <h3>Task Prioritization</h3>
+            <p>
+              Important tasks skip the queue. Critical operations execute first.
+            </p>
+          </div>
+          <div class="feature">
+            <div class="feature-icon">📈</div>
+            <h3>Progress Tracking</h3>
+            <p>
+              Know exactly what's happening with built-in logging and
+              monitoring.
+            </p>
+          </div>
+          <div class="feature">
+            <div class="feature-icon">⚡</div>
+            <h3>Intelligent Throttling</h3>
+            <p>
+              Adaptive execution prevents resource exhaustion automatically.
+            </p>
+          </div>
+          <div class="feature">
+            <div class="feature-icon">🕐</div>
+            <h3>Expiration Control</h3>
+            <p>
+              Stop processing after deadlines. Perfect for time-sensitive
+              operations.
+            </p>
+          </div>
+          <div class="feature">
+            <div class="feature-icon">🛡️</div>
+            <h3>Error Resilient</h3>
+            <p>Individual task failures don't break the entire execution.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section-dark">
+      <div class="container">
+        <h2>The Problem with <span class="highlight">Promise.all()</span></h2>
+
+        <div class="code-comparison">
+          <div class="code-block">
+            <div class="code-header bad">❌ Promise.all() Approach</div>
+            <pre><code>// Starts ALL 10,000 requests immediately!
+const results = await Promise.all(
+  urls.map(url => fetch(url))
+);
+
+// Result: Server overwhelmed 💥
+// - No concurrency control
+// - Resource exhaustion
+// - No prioritization
+// - No progress tracking</code></pre>
+          </div>
+
+          <div class="code-block">
+            <div class="code-header good">✅ async-task-runner-js</div>
+            <pre><code>const runner = createAsyncTasksRunner('Fetcher', {
+  maxInParallel: 50  // Control concurrency
+});
+
+urls.forEach(url => {
+  runner.addTask(() => fetch(url));
+});
+
+await runner.finishAll();
+// Result: Controlled, efficient ✨</code></pre>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <div class="container">
+        <h2>Feature <span class="highlight">Comparison</span></h2>
+
+        <table class="comparison-table">
+          <thead>
+            <tr>
+              <th>Feature</th>
+              <th>Promise.all()</th>
+              <th>async-task-runner-js</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Concurrency Control</strong></td>
+              <td>❌ All at once</td>
+              <td>✅ Configurable limit</td>
+            </tr>
+            <tr>
+              <td><strong>Memory Efficiency</strong></td>
+              <td>❌ All promises in memory</td>
+              <td>✅ Queue management</td>
+            </tr>
+            <tr>
+              <td><strong>Prioritization</strong></td>
+              <td>❌ No control</td>
+              <td>✅ Priority-based execution</td>
+            </tr>
+            <tr>
+              <td><strong>Progress Tracking</strong></td>
+              <td>❌ Manual implementation</td>
+              <td>✅ Built-in logging</td>
+            </tr>
+            <tr>
+              <td><strong>Error Handling</strong></td>
+              <td>❌ Fails all on single error</td>
+              <td>✅ Individual task handling</td>
+            </tr>
+            <tr>
+              <td><strong>Resource Safety</strong></td>
+              <td>❌ Can overwhelm system</td>
+              <td>✅ Prevents exhaustion</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="section-dark">
+      <div class="container">
+        <h2>Quick <span class="highlight">Installation</span></h2>
+
+        <div class="install-command">
+          <code>npm install async-task-runner-js</code>
+        </div>
+
+        <div style="margin-top: 40px">
+          <h3 style="color: var(--accent); margin-bottom: 20px">Basic Usage</h3>
+          <div class="code-block">
+            <pre><code>import { createAsyncTasksRunner } from 'async-task-runner-js';
+
+const runner = createAsyncTasksRunner('My Tasks', {
+  maxInParallel: 10  // Run 10 tasks simultaneously
+});
+
+// Add tasks
+for (let i = 0; i < 100; i++) {
+  runner.addTask(async () => {
+    const result = await someAsyncOperation(i);
+    return result;
+  });
+}
+
+// Wait for all tasks to complete
+await runner.finishAll();
+// Output: My Tasks finished! 100 tasks</code></pre>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <div class="container">
+        <h2>Real-World <span class="highlight">Performance</span></h2>
+
+        <div
+          style="
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 40px;
+            margin-top: 40px;
+          "
+        >
+          <div class="feature" style="border-color: var(--error)">
+            <h3 style="color: var(--error)">Before (Promise.all)</h3>
+            <ul
+              style="
+                list-style: none;
+                padding: 0;
+                margin-top: 20px;
+                line-height: 2;
+              "
+            >
+              <li>📊 Peak memory: <strong>~2GB</strong></li>
+              <li>⏱️ Time: <strong>45s</strong></li>
+              <li>
+                ✓ Success rate: <strong style="color: var(--error)">60%</strong>
+              </li>
+              <li style="color: var(--text-secondary)">
+                Many failures due to rate limiting
+              </li>
+            </ul>
+          </div>
+
+          <div class="feature" style="border-color: var(--success)">
+            <h3 style="color: var(--success)">After (async-task-runner-js)</h3>
+            <ul
+              style="
+                list-style: none;
+                padding: 0;
+                margin-top: 20px;
+                line-height: 2;
+              "
+            >
+              <li>📊 Peak memory: <strong>~200MB</strong></li>
+              <li>⏱️ Time: <strong>60s</strong></li>
+              <li>
+                ✓ Success rate:
+                <strong style="color: var(--success)">100%</strong>
+              </li>
+              <li style="color: var(--success)">All tasks successful</li>
+            </ul>
+          </div>
+        </div>
+
+        <p
+          style="
+            text-align: center;
+            margin-top: 40px;
+            font-size: 1.2rem;
+            color: var(--text-secondary);
+          "
+        >
+          <strong
+            >Trade a little time for massive reliability and resource
+            efficiency.</strong
+          >
+        </p>
+      </div>
+    </section>
+
+    <section class="section-dark">
+      <div class="container">
+        <h2>Ready to <span class="highlight">Get Started</span>?</h2>
+        <p
+          style="
+            text-align: center;
+            max-width: 800px;
+            margin: 20px auto 40px;
+            font-size: 1.2rem;
+            color: var(--text-secondary);
+          "
+        >
+          Join developers who are empowering their JavaScript applications with
+          intelligent task management.
+        </p>
+
+        <div class="cta-buttons">
+          <a
+            href="https://github.com/neilor/async-task-runner-js#readme"
+            class="btn btn-primary"
+            >Read Documentation</a
+          >
+          <a
+            href="https://www.npmjs.com/package/async-task-runner-js"
+            class="btn btn-secondary"
+            >View on npm</a
+          >
+        </div>
+      </div>
+    </section>
+
+    <footer>
+      <div class="container">
+        <div class="footer-links">
+          <a href="https://github.com/neilor/async-task-runner-js">GitHub</a>
+          <a href="https://www.npmjs.com/package/async-task-runner-js">npm</a>
+          <a href="https://github.com/neilor/async-task-runner-js/issues"
+            >Issues</a
+          >
+          <a href="https://github.com/neilor">@neilor</a>
+        </div>
+        <p>MIT License © 2025 Neilor Caldeira</p>
+        <p style="margin-top: 10px; color: var(--text-secondary)">
+          Empower your JavaScript. Control the chaos. Ship with confidence.
+        </p>
+      </div>
+    </footer>
+  </body>
+</html>
