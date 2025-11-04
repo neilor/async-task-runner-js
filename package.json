@@ -1,0 +1,79 @@
+{
+  "name": "async-task-runner-js",
+  "version": "1.0.0-alpha.1",
+  "description": "Empower your single-threaded JavaScript with intelligent task pooling, throttling, and prioritization. A better alternative to Promise.all() for managing thousands of async operations without overwhelming your resources.",
+  "main": "./dist/cjs/index.js",
+  "module": "./dist/esm/index.js",
+  "types": "./dist/types/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/types/index.d.ts",
+      "import": "./dist/esm/index.js",
+      "require": "./dist/cjs/index.js"
+    }
+  },
+  "files": [
+    "dist",
+    "LICENSE.md",
+    "README.md"
+  ],
+  "scripts": {
+    "build": "npm run build:clean && npm run build:esm && npm run build:cjs && npm run build:types",
+    "build:clean": "rm -rf dist",
+    "build:esm": "tsc --project tsconfig.esm.json",
+    "build:cjs": "tsc --project tsconfig.cjs.json",
+    "build:types": "tsc --project tsconfig.types.json",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage",
+    "prepublishOnly": "npm run build"
+  },
+  "keywords": [
+    "async",
+    "task",
+    "runner",
+    "promise",
+    "parallel",
+    "pooling",
+    "throttling",
+    "concurrency",
+    "queue",
+    "priority",
+    "promise-pool",
+    "task-queue",
+    "rate-limiting",
+    "batch-processing",
+    "async-pool",
+    "promise-throttle",
+    "concurrency-control",
+    "task-scheduler",
+    "promise-queue",
+    "event-loop",
+    "single-thread",
+    "resource-management",
+    "promise-all",
+    "typescript"
+  ],
+  "author": {
+    "name": "Neilor Caldeira",
+    "url": "https://github.com/neilor"
+  },
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/neilor/async-task-runner-js.git"
+  },
+  "bugs": {
+    "url": "https://github.com/neilor/async-task-runner-js/issues"
+  },
+  "homepage": "https://github.com/neilor/async-task-runner-js#readme",
+  "engines": {
+    "node": ">=14.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "@vitest/coverage-v8": "^1.0.0",
+    "typescript": "^5.0.0",
+    "vitest": "^1.0.0"
+  }
+}
