@@ -18,11 +18,12 @@
     "README.md"
   ],
   "scripts": {
-    "build": "npm run build:clean && npm run build:esm && npm run build:cjs && npm run build:types",
+    "build": "npm run build:clean && npm run build:esm && npm run build:cjs && npm run build:types && npm run build:package-jsons",
     "build:clean": "rm -rf dist",
     "build:esm": "tsc --project tsconfig.esm.json",
     "build:cjs": "tsc --project tsconfig.cjs.json",
     "build:types": "tsc --project tsconfig.types.json",
+    "build:package-jsons": "echo '{\"type\":\"module\"}' > dist/esm/package.json && echo '{\"type\":\"commonjs\"}' > dist/cjs/package.json",
     "test": "vitest run",
     "test:watch": "vitest",
     "test:coverage": "vitest run --coverage",
