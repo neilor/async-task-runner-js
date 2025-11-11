@@ -1,6 +1,6 @@
 {
   "name": "async-task-runner-js",
-  "version": "1.0.1-alpha.1",
+  "version": "1.0.1",
   "description": "Empower your single-threaded JavaScript with intelligent task pooling, throttling, and prioritization. A better alternative to Promise.all() for managing thousands of async operations without overwhelming your resources.",
   "main": "./dist/cjs/index.js",
   "module": "./dist/esm/index.js",
